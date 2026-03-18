@@ -6,10 +6,17 @@ import routes from "./routes";
 import { errorHandler } from "./middleware/errorHandler";
 
 const app = express();
+
 app.use(cors());
 app.use(helmet());
 app.use(express.json({ limit: "5mb" }));
 app.use(morgan("dev"));
+
+// ✅ ROOT ROUTE ADD KIYA
+app.get("/", (req, res) => {
+  res.send("API is running 🚀");
+});
+
 app.use("/api/v1", routes);
 app.use(errorHandler);
 
