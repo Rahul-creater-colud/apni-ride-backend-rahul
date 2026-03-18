@@ -1,6 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IVehicle extends Document {
+interface IVehicle {
+  model: string;
+ 
   owner: mongoose.Types.ObjectId;
   type: "bike" | "car";
   brand: string;
