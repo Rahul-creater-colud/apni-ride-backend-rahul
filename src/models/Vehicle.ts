@@ -73,3 +73,4 @@ const vehicleSchema = new Schema<IVehicle>(
 );
 
 export default mongoose.model("Vehicle", vehicleSchema);
+  
