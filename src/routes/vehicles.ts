@@ -27,37 +27,25 @@ router.post("/", auth(["owner", "admin"]), async (req: AuthedRequest, res, next)
     const created = await Vehicle.create({
       owner: req.user!.id,
       ...body,
-      location: { type: "Point", coordinates: [body.location.lng, body.location.lat] }
+      location: {
+        type: "Point",
+        coordinates: [body.location.lng, body.location.lat]
+      }
     });
+
     res.json(created);
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.get("/", async (req, res, next) => {
+router.get("/", async (_req, res, next) => {
   try {
-    const { lat, lng, radius = 5000 } = req.query as any;
-    const query: any = { status: "active" };
-    let cursor = Vehicle.find(query);
-    if (lat && lng) {
-      cursor = cursor.where("location").near({
-        center: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
-        maxDistance: Number(radius)
-      });
-    }
-    const vehicles = await cursor.limit(50);
-    res.json(vehicles.map((v) => ({
-      ...v.toObject(),
-      distanceKm: undefined // can compute with geonear aggregation if needed
-    })));
-  } catch (err) { next(err); }
-});
-
-router.get("/:id", async (req, res, next) => {
-  try {
-    const vehicle = await Vehicle.findById(req.params.id);
-    if (!vehicle) return res.status(404).json({ message: "Not found" });
-    res.json(vehicle);
-  } catch (err) { next(err); }
+    const vehicles = await Vehicle.find({ status: "active" }).limit(50);
+    res.json(vehicles);
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;
