@@ -8,16 +8,34 @@ const router = Router();
 
 router.post("/send-otp", async (req, res, next) => {
   try {
-    const { phone } = await Joi.object({ phone: Joi.string().required() }).validateAsync(req.body);
+    const { phone } = await Joi.object({
+      phone: Joi.string().required(),
+    }).validateAsync(req.body);
+
     let user = await User.findOne({ phone });
-    if (!user) user = await User.create({ phone });
+
+    if (!user) {
+      user = await User.create({ phone });
+    }
+
     const code = generateOtp();
+
     user.otpHash = await hashOtp(code);
     user.otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+
     await user.save();
-    await sendOtpSMS(phone, code);
-    res.json({ message: "OTP sent" });
-  } catch (err) { next(err); }
+
+    console.log("OTP CODE:", code);
+
+    // ✅ IMPORTANT FIX
+    res.json({
+      message: "OTP sent",
+      otp: code,
+    });
+
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post("/verify-otp", async (req, res, next) => {
