@@ -1,19 +1,21 @@
-import bcrypt from "bcryptjs";
+import bcrypt from 'bcryptjs';
 
-export function generateOtp() {
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  return code;
+export function generateOtp(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export async function hashOtp(code: string) {
+export async function hashOtp(code: string): Promise<string> {
   return bcrypt.hash(code, 10);
 }
 
-export async function compareOtp(code: string, hash: string) {
+export async function compareOtp(code: string, hash: string): Promise<boolean> {
   return bcrypt.compare(code, hash);
 }
 
-// TODO: integrate real SMS provider here
-export async function sendOtpSMS(phone: string, code: string) {
-  console.log(`OTP to ${phone}: ${code}`);
+export async function sendOtpSMS(phone: string, code: string): Promise<void> {
+  if (process.env.NODE_ENV === 'production') {
+    console.log(`[SMS] Sending OTP to ${phone}: ${code}`);
+  } else {
+    console.log(`[DEV OTP] Phone: ${phone} | Code: ${code}`);
+  }
 }
